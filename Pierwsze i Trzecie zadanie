@@ -1,0 +1,35 @@
+PIERWSZE
+1. Zaloguj się na użytkownika: root su -
+   Przejdź do folderu dev : cd /dev/
+   ls | grep sd
+2. Wybierz t e, które mają najmniejszy rozmiar df -h
+   Dopóki dyski nie zostały przygotowane, stwórz na każdym z nich pokolei partycję: 
+   fdisk /dev/*nazwaWybranegoDysku*
+   Wybierz nową: n
+   Ustaw partycję jako podstawowa: p
+   Wybierz numer partycji, albo zostaw domyślne - 1: enter
+   Wybierz rozmiar partycji, albo zostaw domyślne - cała partycja: enter
+   Wybierz komendę: t
+   Ustaw Linux raid auto: fd
+   Zapisz zmiany na dysku: w
+3. Stwórz raid z wybranych dysków: mdadm --create /dev/md1 --lovel=raid1 --raid-devices=2 /dev/sda1 /deb/sdb1   
+   Upewnij się, że stworzyłeś raid: mdadm --query /dev/md1
+   Sformatuj raid wybranym systemem plików np. ext4: mkfs.ext4 /dev/md1    
+4. Sprawdź nr UUID dla raidu md1: blkid 
+   Skopiuj numer UUID /dev/md1
+   Otworz plik fstab: vim /etc/fstab
+   Wklej UUID  /dev/md/volume  ext4 defaults 0 0
+   Zapisz plik
+   Stwórz folder do zamontowania RAIDu: mkdir /dev/md/volume
+   Zamontuj urządzenie RAID z pliku fstab: mount -a
+   Sprawdź na liście czy udało się zamontować: df -h
+5. Wejdź w stworzony Raid: cd /dev/md/volume
+   Stwórz plik: seq 333 > numb.txt   
+   Sprawdź czy plik się stworzył: ls
+6. Sprawdź sumę kontrolną pliku: sum numb.txt
+
+TRZECIE - dużo zależy od tego jaki mamy cel w pracy, czy przetestować czy sterownik działa, czy postarać się za wszelką cenę łapać dumpy i dowiedzieć się co nie działa w nim, czy po prostu postawić system do stanu używalności.
+1. Jeśli istnieje możliwość wyłącz maszynę i odłącz z zasilania na chwilę, włącz ponownie maszynę.
+2. Jeśli powtarza się sytuacja zaczynam notować bug - screen, id sterownika, opis maszyny.
+3. Na ekranie wybierania systemu najedź na Ubuntu, naciśnij E żeby edytować GRUB, na końcu przedostatniej linii usuń\dodaj nomodeset, wyjdź zapisując plik, jeżeli uda się wejść do systemu sprawdź sterowniki, które ostatnio aktualizowałeś i zainstaluj poprzednie działające.
+4. Jeśli chcemy złapać dump'a i dowiedzieć się więcej proponowałbym użyć tego poradnika: https://www.linuxjournal.com/content/oops-debugging-kernel-panics-0
